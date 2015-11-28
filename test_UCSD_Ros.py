@@ -3,28 +3,38 @@ import unittest
 import os
 import tempfile
 import filecmp
-
+import glob
 import UCSD_Ros
 reload(UCSD_Ros)
 
-def makeTmpFile(self,data,fName):
+def makeTmpFile(data,fName):
 	with open(fName,"w") as f:
 		for d in data:
 			f.write(d)
-	with open(fName) as f:
-		for line in f:
-			print ("ins: ", line)
+	# with open(fName) as f:
+	# 	for line in f:
+	# 		print ("ins: ", line)
+
 
 class testLoader(unittest.TestCase):
 
 	def test1(self):
-		testInput = "5 \nCAATCCAAC" 
-		testOutput = "CAATC\nAATCC\nATCCA\nTCCAA\nCCAAC"
-		makeTmpFile(self,testInput,"tmpTestInp.txt")
-		makeTmpFile(self,testOutput,"tmpTestOut.txt")
-		rs = UCSD_Ros.UCSD_Ros_Solver()
-		rs.UCSD_StringRecon("tmpTestInp.txt")
-		self.assertTrue(filecmp.cmp("tmpTestOut.txt","tmpTestInp.txt"+"_out"))
+		for (testInput, testOutput) in [
+				("5 \nCAATCCAAC" ,"CAATC\nAATCC\nATCCA\nTCCAA\nCCAAC\n"),
+				("5 \nCAATC" ,"CAATC\n")]:			
+			makeTmpFile(testInput,"tmpTestInp.txt")
+			makeTmpFile(testOutput,"tmpTestOut.txt")
+			rs = UCSD_Ros.UCSD_Ros_Solver()
+			rs.StringRecon("tmpTestInp.txt")
+			with open("tmpTestOut.txt") as f:
+				setTruth = set([el.strip() for el in f.readlines()])
+			with open("tmpTestInp.txt"+"_out") as f:
+				setTest = set([el.strip() for el in f.readlines()])
+			self.assertTrue(setTest==setTruth)
+			print(setTruth,setTest)
+			for tempf in glob.glob('./tmp*'):
+				os.remove(tempf)
+
 
 	def test2(self):
 		self.assertTrue(True)
