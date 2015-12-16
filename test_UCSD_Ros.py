@@ -19,12 +19,13 @@ def makeTmpFile(data,fName):
 class testLoader(unittest.TestCase):
 
 	def test1(self):
+		rs = UCSD_Ros.UCSD_Ros_Solver()
 		for (testInput, testOutput) in [
 				("5 \nCAATCCAAC" ,"CAATC\nAATCC\nATCCA\nTCCAA\nCCAAC\n"),
 				("5 \nCAATC" ,"CAATC\n")]:			
 			makeTmpFile(testInput,"tmpTestInp.txt")
 			makeTmpFile(testOutput,"tmpTestOut.txt")
-			rs = UCSD_Ros.UCSD_Ros_Solver()
+			
 			rs.StringRecon("tmpTestInp.txt")
 			with open("tmpTestOut.txt") as f:
 				setTruth = set([el.strip() for el in f.readlines()])
@@ -34,7 +35,6 @@ class testLoader(unittest.TestCase):
 			print(setTruth,setTest)
 			for tempf in glob.glob('./tmp*'):
 				os.remove(tempf)
-
 
 	def test2(self):
 		self.assertTrue(True)
